@@ -7,12 +7,14 @@ import InfoCard from "../../component/Cards/InfoCard";
 import ExpenseTransactions from "../../component/Dashboard/ExpenseTransactions";
 import FinanceOverview from "../../component/Dashboard/FinanceOverview";
 import Last30DaysExpenses from "../../component/Dashboard/Last30DaysExpenses";
+import RecentIncomeWithChart from "../../component/Dashboard/RecentIncomeWithChart";
 import RecentTransactions from "../../component/Dashboard/RecentTransactions";
 import DashboardLayout from "../../component/layout/DashboardLayout";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { API_PATHS } from "../../utils/apiPaths";
 import axiosInstance from "../../utils/axiosInstance";
 import { addThousandSeparator } from "../../utils/helper";
+import RecentIncome from './../../component/Dashboard/RecentIncome';
 
 const Home = () => {
     useUserAuth()
@@ -78,6 +80,14 @@ const Home = () => {
                     <Last30DaysExpenses
                         data={dashboardData?.last30DaysExpenses?.transactions || []}
 
+                    />
+                    <RecentIncomeWithChart
+                        data={dashboardData?.last60DaysIncome?.transactions.slice(0, 4) || []}
+                        totalIncome={dashboardData?.totalIncome || 0}
+                    />
+                    <RecentIncome
+                        transactions={dashboardData?.last60DaysIncome?.transactions || []}
+                        onSeeMore={() => navigation("/income")}
                     />
                 </div>
             </div>

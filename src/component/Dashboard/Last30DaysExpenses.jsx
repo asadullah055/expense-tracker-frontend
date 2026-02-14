@@ -3,7 +3,10 @@ import { prepareExpenseBarChartData } from '../../utils/helper';
 import CustomsBarChart from '../Chatrs/CustomsBarChart';
 
 const Last30DaysExpenses = ({ data }) => {
+
+
     const [chartData, setChartData] = useState([]);
+
     useEffect(() => {
         const result = prepareExpenseBarChartData(data);
         setChartData(result);
