@@ -1,3 +1,4 @@
+import { Toaster } from "react-hot-toast";
 import {
     Navigate,
     Route,
@@ -23,11 +24,15 @@ const App = () => {
                         <Route path="/login" exact element={<Login />} />
                         <Route path="/signup" exact element={<SignUp />} />
                         <Route path="/dashboard" exact element={<Home />} />
-                        <Route path="/income"  element={<Income />} />
-                        <Route path="/expenses" exact element={<Expense />} />
+                        <Route path="/income" element={<Income />} />
+                        <Route path="/expense" exact element={<Expense />} />
                     </Routes>
                 </Router>
             </div>
+            <Toaster
+                position="top-center"
+                reverseOrder={false}
+            />
         </UserProvider>
     );
 };

@@ -1,17 +1,18 @@
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 const CustomsBarChart = ({ data }) => {
-    console.log(data);
+
 
     const getBarColor = (index) => {
         return index % 2 === 0 ? '#875cf5' : '#cfbefb';
     }
     const CustomTooltip = ({ active, payload, }) => {
+        console.log("payload in custom tooltip", payload);
         if (active && payload && payload.length) {
             return (
                 <div className="bg-white shadow-md rounded-lg p-2 border border-gray-300">
-                    <p className="text-xs font-semibold text-purple-800 mb-1">{`${payload[0]?.payload.category}`}</p>
-                    <p className="text-xs text-gray-600">Amount: <span className='text-sm font-medium text-gray-900'>${payload[0]?.payload.amount}</span></p>
+                    <p className="text-xs font-semibold text-purple-800 mb-1">{`${payload[0]?.payload.source || payload[0]?.payload.category}`}</p>
+                    <p className="text-xs text-gray-600">Amount: <span className='text-sm font-medium text-gray-900'>${payload[0].value}</span></p>
                 </div>
             );
         }
