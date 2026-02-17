@@ -6,7 +6,7 @@ const AddIncomeSourceForm = ({ onAddIncome }) => {
 
     const [income, setIncome] = useState({
         type: '',
-        source: '',
+        category: '',
     });
 
     const [openType, setOpenType] = useState(false);
@@ -60,10 +60,10 @@ const AddIncomeSourceForm = ({ onAddIncome }) => {
 
             {/* SOURCE INPUT */}
             <Inputs
-                value={income.source}
-                onChange={(e) => handleChange('source', e.target.value)}
-                label="Income Source"
-                placeholder="Enter income source"
+                value={income.category}
+                onChange={(e) => handleChange('category', e.target.value)}
+                label="Income Category"
+                placeholder="Enter income category"
                 type="text"
             />
 
@@ -74,7 +74,7 @@ const AddIncomeSourceForm = ({ onAddIncome }) => {
                     className='add-btn add-btn-fill'
                     onClick={() => onAddIncome(income)}
                 >
-                    Add Income
+                    Add Income Category
                 </button>
             </div>
 

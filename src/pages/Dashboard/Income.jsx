@@ -6,12 +6,14 @@ import IncomeList from "../../component/Income/IncomeList";
 import IncomeOverview from "../../component/Income/IncomeOverview";
 import DashboardLayout from "../../component/layout/DashboardLayout";
 import Modal from "../../component/Modal";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { API_PATHS } from "../../utils/apiPaths";
 import axiosInstance from "../../utils/axiosInstance";
 
 const Income = () => {
     useUserAuth()
+    const { currentWorkspace } = useWorkspace();
     const [openAddIncomeModal, setOpenAddIncomeModal] = useState(false);
     const [incomeData, setIncomeData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -38,9 +40,17 @@ const Income = () => {
     // Handle Add Income
 
     const handleAddIncome = async (income) => {
-        const { source, amount, date, icon } = income;
-        if (!source.trim()) {
+        const workspaceId =
+            currentWorkspace?._id ||
+            currentWorkspace?.id ||
+            currentWorkspace?.companyId;
+        const { amount, date, incomeTypeId } = income;
+        if (!incomeTypeId.trim()) {
             toast.error("Source is required");
+            return;
+        }
+        if (!workspaceId) {
+            toast.error("Workspace is required");
             return;
         }
         if (!amount || isNaN(amount) || Number(amount) <= 0) {
@@ -54,10 +64,10 @@ const Income = () => {
         try {
 
             await axiosInstance.post(API_PATHS.INCOME.ADD_INCOME, {
-                source,
+                incomeTypeId,
                 amount,
                 date,
-                icon,
+                workspaceId,
             });
             setOpenAddIncomeModal(false);
             toast.success("Income added successfully");

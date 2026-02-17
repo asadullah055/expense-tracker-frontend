@@ -7,7 +7,6 @@ const CustomsBarChart = ({ data }) => {
         return index % 2 === 0 ? '#875cf5' : '#cfbefb';
     }
     const CustomTooltip = ({ active, payload, }) => {
-        console.log("payload in custom tooltip", payload);
         if (active && payload && payload.length) {
             return (
                 <div className="bg-white shadow-md rounded-lg p-2 border border-gray-300">

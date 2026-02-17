@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import AddExpenseSourceForm from "../../component/Expense/AddExpenseSourceForm";
 import AddIncomeSourceForm from "../../component/Income/AddIncomeSourceForm";
 import Modal from "../../component/Modal";
@@ -6,6 +7,8 @@ import ExpenseSettings from "../../component/Settings/ExpenseSettings";
 import IncomeSettings from "../../component/Settings/IncomeSettings";
 import DashboardLayout from "../../component/layout/DashboardLayout";
 import { useUserAuth } from "../../hooks/useUserAuth";
+import { API_PATHS } from "../../utils/apiPaths";
+import axiosInstance from "../../utils/axiosInstance";
 
 const Settings = () => {
     useUserAuth();
@@ -13,56 +16,105 @@ const Settings = () => {
     const [activeTab, setActiveTab] = useState("income");
     const [openAddIncomeSourceModal, setOpenAddIncomeSourceModal] = useState(false);
     const [openAddExpenseSourceModal, setOpenAddExpenseSourceModal] = useState(false);
-    const [sourceType, setSourceType] = useState("personal");
-    const [incomeSources, setIncomeSources] = useState([
-        { id: 1, type: "personal", name: "Freelancing" },
-        { id: 2, type: "company", name: "Company Salary" },
-    ]);
+    const [loading, setLoading] = useState(false);
+
+    const [incomeSources, setIncomeSources] = useState([]);
     const [expenseSources, setExpenseSources] = useState([
-        { id: 1, type: "personal", name: "Groceries" },
-        { id: 2, type: "company", name: "Office Supplies" },
     ]);
 
-    const filteredIncomeSources = useMemo(() => {
-        if (!sourceType) return incomeSources;
-        return incomeSources.filter((source) => source.type === sourceType);
-    }, [incomeSources, sourceType]);
-    const filteredExpenseSources = useMemo(() => {
-        if (!sourceType) return expenseSources;
-        return expenseSources.filter((source) => source.type === sourceType);
-    }, [expenseSources, sourceType]);
 
-    const handleAddIncomeSource = (income) => {
-        const sourceName = income?.source?.trim();
-        if (!sourceName) return;
+    const fetchExpenseCategoryDetails = async () => {
+        if (loading) return;
+        setLoading(true);
+        try {
+            const response = await axiosInstance.get(API_PATHS.EXPENSECATEGORY.GET_ALL_EXPENSE_CATEGORY);
+            if (response.data) {
+                setExpenseSources(response.data);
+            }
+        } catch (error) {
+            console.log("Something went wrong. Please try again.", error)
+        } finally {
+            setLoading(false);
+        }
+    };
+    const fetchIncomeCategoryDetails = async () => {
+        if (loading) return;
+        setLoading(true);
+        try {
+            const response = await axiosInstance.get(API_PATHS.INCOMECATEGORY.GET_ALL_INCOME_CATEGORY);
+            if (response.data) {
+                setIncomeSources(response.data);
+            }
+        } catch (error) {
+            console.log("Something went wrong. Please try again.", error)
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        setIncomeSources((prev) => [
-            {
-                id: Date.now(),
-                type: sourceType,
-                name: sourceName,
-            },
-            ...prev,
-        ]);
+
+    const handleAddIncomeSource = async (income) => {
+        const { category, type } = income;
+        if (!category.trim()) {
+            toast.error("Category is required");
+            return;
+        }
+        if (!type) {
+            toast.error("Type is required");
+            return;
+        }
+
+        try {
+
+            await axiosInstance.post(API_PATHS.INCOMECATEGORY.ADD_EXPENSE_CATEGORY, {
+                category,
+                type,
+            });
+            setOpenAddExpenseSourceModal(false);
+            toast.success("Expense added successfully");
+            fetchIncomeCategoryDetails();
+        } catch (error) {
+            console.error("Error adding expense:", error);
+            toast.error(error.response?.data?.message || "Failed to add expense");
+        }
         setOpenAddIncomeSourceModal(false);
     };
-    const handleAddExpenseSource = (sourceName) => {
-        const trimmedName = sourceName?.trim();
-        if (!trimmedName) return;
+    const handleAddExpenseSource = async (expense) => {
+        const { category, type } = expense;
+        if (!category.trim()) {
+            toast.error("Category is required");
+            return;
+        }
+        if (!type) {
+            toast.error("Type is required");
+            return;
+        }
 
-        setExpenseSources((prev) => [
-            {
-                id: Date.now(),
-                type: sourceType,
-                name: trimmedName,
-            },
-            ...prev,
-        ]);
-        setOpenAddExpenseSourceModal(false);
+        try {
+
+            await axiosInstance.post(API_PATHS.EXPENSECATEGORY.ADD_EXPENSE_CATEGORY, {
+                category,
+                type,
+            });
+            setOpenAddExpenseSourceModal(false);
+            toast.success("Expense added successfully");
+            fetchExpenseCategoryDetails();
+        } catch (error) {
+            console.error("Error adding expense:", error);
+            toast.error(error.response?.data?.message || "Failed to add expense");
+        }
+
     };
-
+    useEffect(() => {
+        fetchExpenseCategoryDetails();
+        return () => { }
+    }, [])
+    useEffect(() => {
+        fetchIncomeCategoryDetails();
+        return () => { }
+    }, [])
     return (
-        <DashboardLayout activeMenu={"Settings"}>
+        <DashboardLayout  activeMenu={"Settings"}>
             <div className="my-5 mx-auto card">
                 <div className="flex items-center gap-3 mb-6">
                     <button
@@ -90,12 +142,13 @@ const Settings = () => {
 
                     <IncomeSettings
                         onOpenModal={() => setOpenAddIncomeSourceModal(true)}
+                        sources={incomeSources}
 
                     />
                 ) : (
                     <ExpenseSettings
                         onOpenModal={() => setOpenAddExpenseSourceModal(true)}
-                        sources={filteredExpenseSources}
+                        sources={expenseSources}
                     />
                 )}
 

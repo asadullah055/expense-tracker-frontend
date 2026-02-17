@@ -1,12 +1,15 @@
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useWorkspace } from '../../context/WorkspaceContext';
 import { UserContext } from '../../context/userContext';
 import { SIDE_MENU_DATA } from '../../utils/data';
 import CharAvatar from '../Cards/CharAvatar';
 const SideMenu = ({ activeMenu }) => {
     const { user, clearUser } = useContext(UserContext);
+    const { currentWorkspace } = useWorkspace();
 
     const navigate = useNavigate();
+    const displayName = currentWorkspace?.name || currentWorkspace?.companyName || user?.fullName || "";
 
     const handleClick = (route) => {
         if (route === "logout") {
@@ -32,14 +35,14 @@ const SideMenu = ({ activeMenu }) => {
                             className="w-20 h-20 rounded-full bg-slate-400"
                         />
                     ) : <CharAvatar
-                        fullName={user?.fullName || ""}
+                        fullName={displayName}
                         width="w-20"
                         height="h-20"
                         style="text-xl"
                     />
                 }
                 <h5 className='text-gray-950 font-medium leading-6'>
-                    {user?.fullName || ""}
+                    {displayName}
                 </h5>
             </div>
             {

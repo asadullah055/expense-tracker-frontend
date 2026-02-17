@@ -5,7 +5,6 @@ import CustomsBarChart from "../Chatrs/CustomsBarChart";
 
 const IncomeOverview = ({ transactions, onAddIncome }) => {
     const [chatData, setChatData] = useState([]);
-console.log("transactions in income overview", transactions);
     useEffect(() => {
         const result = prepareIncomeBarChartData(transactions);
         setChatData(result);

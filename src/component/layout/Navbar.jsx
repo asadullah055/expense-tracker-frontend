@@ -1,45 +1,131 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { HiChevronDown, HiOutlineMenu, HiOutlineX } from "react-icons/hi";
+import { UserContext } from "../../context/userContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { API_PATHS } from "../../utils/apiPaths";
+import axiosInstance from "../../utils/axiosInstance";
 import Inputs from "../Inputes/Inputs";
 import Modal from "../Modal";
-import { HiChevronDown, HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import SideMenu from "./SideMenu";
 
-const initialWorkspaces = [
-    { id: "personal", name: "Asadullah Ahmed", type: "personal" },
-    { id: "c1", name: "ABC Company", type: "company" },
-    { id: "c2", name: "XYZ Company", type: "company" },
-];
-
 const Navbar = ({ activeMenu }) => {
+    const { user } = useContext(UserContext);
+
     const [openSideMenu, setOpenSideMenu] = useState(false);
     const [openWorkspace, setOpenWorkspace] = useState(false);
     const [openAddCompanyModal, setOpenAddCompanyModal] = useState(false);
+
     const [companyName, setCompanyName] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const [workspaces, setWorkspaces] = useState(initialWorkspaces);
-    const [currentWorkspace, setCurrentWorkspace] = useState(initialWorkspaces[0]);
+    const [workspaces, setWorkspaces] = useState([]);
 
-    const handleAddWorkspace = () => {
-        const trimmedName = companyName.trim();
-        if (!trimmedName) return;
+    const { currentWorkspace, setCurrentWorkspace } = useWorkspace();
+    const getWorkspaceId = (workspace) =>
+        workspace?._id || workspace?.id || workspace?.companyId || null;
+    const isSameWorkspace = (a, b) => {
+        const idA = getWorkspaceId(a);
+        const idB = getWorkspaceId(b);
+        if (idA && idB) return idA === idB;
 
-        const newWorkspace = {
-            id: `c-${Date.now()}`,
-            name: trimmedName,
-            type: "company",
-        };
-
-        setWorkspaces((prev) => [...prev, newWorkspace]);
-        setCurrentWorkspace(newWorkspace);
-        setCompanyName("");
-        setOpenAddCompanyModal(false);
-        setOpenWorkspace(false);
+        const nameA = a?.name || a?.companyName;
+        const nameB = b?.name || b?.companyName;
+        return !!nameA && !!nameB && nameA === nameB && a?.type === b?.type;
     };
 
+    // ================= FETCH ALL WORKSPACES =================
+    const fetchAllWorkspaces = async () => {
+        try {
+            setLoading(true);
+
+            const res = await axiosInstance.get(
+                API_PATHS.COMPANY.GET_ALL_COMPANY
+            );
+
+            const companies = res?.data || [];
+
+            // Personal Workspace from User
+            const personalWorkspace = user
+                ? {
+                    _id: user._id,
+                    name: user.fullName,
+                    type: "personal",
+                }
+                : null;
+
+            const finalWorkspaces = personalWorkspace
+                ? [personalWorkspace, ...companies]
+                : companies;
+
+            setWorkspaces(finalWorkspaces);
+
+            if (finalWorkspaces.length > 0) {
+                const currentWorkspaceId = getWorkspaceId(currentWorkspace);
+                const matchedById = currentWorkspaceId
+                    ? finalWorkspaces.find((ws) => getWorkspaceId(ws) === currentWorkspaceId)
+                    : null;
+                const currentWorkspaceName = currentWorkspace?.name || currentWorkspace?.companyName;
+                const matchedByName = !matchedById && currentWorkspaceName
+                    ? finalWorkspaces.find(
+                        (ws) =>
+                            (ws.name || ws.companyName) === currentWorkspaceName &&
+                            ws.type === currentWorkspace?.type
+                    )
+                    : null;
+                const matchedWorkspace = matchedById || matchedByName;
+
+                if (matchedWorkspace) {
+                    if (!isSameWorkspace(matchedWorkspace, currentWorkspace)) {
+                        setCurrentWorkspace(matchedWorkspace);
+                    }
+                } else if (!currentWorkspace) {
+                    setCurrentWorkspace(finalWorkspaces[0]);
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to load workspaces");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ================= ADD COMPANY =================
+    const handleAddWorkspace = async () => {
+        if (!companyName.trim()) {
+            toast.error("Company name required");
+            return;
+        }
+
+        try {
+            await axiosInstance.post(API_PATHS.COMPANY.ADD_COMPANY, {
+                companyName,
+            });
+
+            toast.success("Company added");
+
+            setCompanyName("");
+            setOpenAddCompanyModal(false);
+
+            fetchAllWorkspaces(); // Refresh list
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to add company");
+        }
+    };
+
+    // ================= LOAD WHEN USER READY =================
+    useEffect(() => {
+        if (user) {
+            fetchAllWorkspaces();
+        }
+    }, [user]);
+
+    // ================= RENDER =================
     return (
         <>
             <div className="flex items-center justify-between gap-5 bg-white border border-b border-gray-200/50 backdrop-blur-[2px] py-4 px-7 sticky top-0 z-30">
-                {/* Left Section */}
+                {/* LEFT */}
                 <div className="flex items-center gap-4">
                     <button
                         className="block lg:hidden text-black"
@@ -56,15 +142,14 @@ const Navbar = ({ activeMenu }) => {
                         Expense Tracker
                     </h2>
 
-                    {/* Workspace Switcher */}
+                    {/* WORKSPACE SWITCHER */}
                     <div className="relative">
                         <button
                             onClick={() => setOpenWorkspace(!openWorkspace)}
                             className="flex items-center justify-between gap-2 border border-gray-300 px-3 py-2 rounded-lg min-w-60 hover:bg-gray-50 transition"
                         >
                             <span className="text-sm font-medium">
-
-                                {currentWorkspace.name}
+                                {currentWorkspace?.name || currentWorkspace?.companyName || "Loading..."}
                             </span>
                             <HiChevronDown />
                         </button>
@@ -73,14 +158,14 @@ const Navbar = ({ activeMenu }) => {
                             <div className="absolute top-12 left-0 min-w-60 bg-white border border-gray-200 rounded-xl shadow-lg p-2 z-50">
                                 {workspaces.map((ws) => (
                                     <button
-                                        key={ws.id}
+                                        key={ws._id}
                                         onClick={() => {
                                             setCurrentWorkspace(ws);
                                             setOpenWorkspace(false);
                                         }}
                                         className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm"
                                     >
-                                        {ws.name}
+                                        {ws.name || ws.companyName}
                                     </button>
                                 ))}
 
@@ -100,7 +185,7 @@ const Navbar = ({ activeMenu }) => {
                     </div>
                 </div>
 
-                {/* Mobile Side Menu */}
+                {/* MOBILE SIDE MENU */}
                 {openSideMenu && (
                     <div className="fixed top-[61px] -ml-4 bg-white">
                         <SideMenu activeMenu={activeMenu} />
@@ -108,6 +193,7 @@ const Navbar = ({ activeMenu }) => {
                 )}
             </div>
 
+            {/* ADD COMPANY MODAL */}
             <Modal
                 isOpen={openAddCompanyModal}
                 onClose={() => {
@@ -116,23 +202,29 @@ const Navbar = ({ activeMenu }) => {
                 }}
                 title="Add Company"
             >
-                <Inputs
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    label="Company name"
-                    placeholder="Enter company name"
-                    type="text"
-                />
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleAddWorkspace();
+                    }}
+                >
+                    <Inputs
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        label="Company name"
+                        placeholder="Enter company name"
+                        type="text"
+                    />
 
-                <div className="flex justify-end mt-6">
-                    <button
-                        type="button"
-                        className="add-btn add-btn-fill"
-                        onClick={handleAddWorkspace}
-                    >
-                        Add Workspace
-                    </button>
-                </div>
+                    <div className="flex justify-end mt-6">
+                        <button
+                            type="submit"
+                            className="add-btn add-btn-fill"
+                        >
+                            Add Workspace
+                        </button>
+                    </div>
+                </form>
             </Modal>
         </>
     );

@@ -26,4 +26,17 @@ export const API_PATHS = {
   IMAGE: {
     UPLOAD_IMAGE: "/api/v1/auth/upload-image",
   },
+  EXPENSECATEGORY:{
+    ADD_EXPENSE_CATEGORY :"/api/v1/expensecategory/add",
+    GET_ALL_EXPENSE_CATEGORY: "/api/v1/expensecategory/get",
+  },
+  INCOMECATEGORY:{
+    ADD_EXPENSE_CATEGORY :"/api/v1/incomecategory/add",
+    GET_ALL_INCOME_CATEGORY: "/api/v1/incomecategory/get",
+    GET_ALL_INCOME_CATEGORY_TYPE: "/api/v1/incomecategory/get",
+  },
+  COMPANY:{
+    ADD_COMPANY :"/api/v1/company/add",
+    GET_ALL_COMPANY: "/api/v1/company/get",
+  }
 };

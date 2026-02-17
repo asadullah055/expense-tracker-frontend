@@ -6,7 +6,7 @@ const AddExpenseSourceForm = ({ onAddExpenseSource }) => {
 
     const [expense, setExpense] = useState({
         type: "",
-        source: ""
+        category: ""
     });
 
     const [openType, setOpenType] = useState(false);
@@ -22,9 +22,7 @@ const AddExpenseSourceForm = ({ onAddExpenseSource }) => {
         setOpenType(false);
     };
 
-    const handleSubmit = () => {
-        onAddExpenseSource(expense);
-    };
+
 
     return (
         <div className="space-y-5">
@@ -61,12 +59,12 @@ const AddExpenseSourceForm = ({ onAddExpenseSource }) => {
                 )}
             </div>
 
-            {/* SOURCE INPUT */}
+            {/* Category INPUT */}
             <Inputs
-                value={expense.source}
-                onChange={(e) => handleChange("source", e.target.value)}
-                label="Expense Source"
-                placeholder="Enter expense source"
+                value={expense.category}
+                onChange={(e) => handleChange("category", e.target.value)}
+                label="Expense Category"
+                placeholder="Enter expense Category"
                 type="text"
             />
 
@@ -75,9 +73,9 @@ const AddExpenseSourceForm = ({ onAddExpenseSource }) => {
                 <button
                     type="button"
                     className="add-btn add-btn-fill"
-                    onClick={handleSubmit}
+                    onClick={() => onAddExpenseSource(expense)}
                 >
-                    Add Expense Source
+                    Add Expense Category
                 </button>
             </div>
 
