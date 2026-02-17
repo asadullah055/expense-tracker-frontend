@@ -1,11 +1,11 @@
 import React from 'react';
-import {FaRegEyeSlash, FaRegEye} from 'react-icons/fa';
+import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 const Inputs = ({ value, onChange, label, placeholder, type }) => {
     const [showPassword, setShowPassword] = React.useState(false);
     const toggleShowPassword = () => { setShowPassword(!showPassword) }
     return (
         <div>
-            <label className="text-[13px] text-slate-800">{label}</label>
+            <label className="text-[14px] text-slate-800 font-semibold">{label}</label>
 
             <div className="input-box flex items-center">
                 <input

@@ -1,0 +1,88 @@
+import { useState } from "react";
+import { MdKeyboardArrowDown } from "react-icons/md";
+import Inputs from "../Inputes/Inputs";
+
+const AddExpenseSourceForm = ({ onAddExpenseSource }) => {
+
+    const [expense, setExpense] = useState({
+        type: "",
+        source: ""
+    });
+
+    const [openType, setOpenType] = useState(false);
+
+    const types = ["Personal", "Company"];
+
+    const handleChange = (key, value) => {
+        setExpense(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleSelectType = (value) => {
+        handleChange("type", value);
+        setOpenType(false);
+    };
+
+    const handleSubmit = () => {
+        onAddExpenseSource(expense);
+    };
+
+    return (
+        <div className="space-y-5">
+
+            {/* TYPE DROPDOWN */}
+            <div className="relative">
+                <label className="block text-[14px] text-slate-800 font-semibold mb-1">
+                    Type
+                </label>
+
+                <div
+                    onClick={() => setOpenType(!openType)}
+                    className="w-1/2 border border-gray-300 rounded-lg px-4 py-2 cursor-pointer bg-white flex justify-between items-center"
+                >
+                    <span className={expense.type ? "text-gray-800" : "text-gray-400"}>
+                        {expense.type || "Select Type"}
+                    </span>
+
+                    <MdKeyboardArrowDown size={20} />
+                </div>
+
+                {openType && (
+                    <ul className="absolute z-50 mt-2 w-1/2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                        {types.map((item) => (
+                            <li
+                                key={item}
+                                onClick={() => handleSelectType(item)}
+                                className="px-4 py-2 hover:bg-purple-50 hover:text-purple-600 cursor-pointer transition"
+                            >
+                                {item}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
+            {/* SOURCE INPUT */}
+            <Inputs
+                value={expense.source}
+                onChange={(e) => handleChange("source", e.target.value)}
+                label="Expense Source"
+                placeholder="Enter expense source"
+                type="text"
+            />
+
+            {/* BUTTON */}
+            <div className="flex justify-end mt-6">
+                <button
+                    type="button"
+                    className="add-btn add-btn-fill"
+                    onClick={handleSubmit}
+                >
+                    Add Expense Source
+                </button>
+            </div>
+
+        </div>
+    );
+};
+
+export default AddExpenseSourceForm;

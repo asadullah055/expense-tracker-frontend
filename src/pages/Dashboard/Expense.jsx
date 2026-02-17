@@ -120,8 +120,6 @@ const Expense = () => {
                 </div>
 
 
-
-
                 <Modal
                     isOpen={openAddExpenseModal}
                     onClose={() => setOpenAddExpenseModal(false)}

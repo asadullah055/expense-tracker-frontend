@@ -1,3 +1,4 @@
+import { IoSettingsOutline } from "react-icons/io5";
 import {
   LuHandCoins,
   LuLayoutDashboard,
@@ -25,6 +26,12 @@ export const SIDE_MENU_DATA = [
     label: "Expense",
     icon: LuHandCoins,
     path: "/expense",
+  },
+  {
+    id: "03",
+    label: "Settings",
+    icon: IoSettingsOutline,
+    path: "/settings",
   },
 
   {
