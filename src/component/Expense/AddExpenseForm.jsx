@@ -75,7 +75,7 @@ const AddExpenseForm = ({ onAddExpense }) => {
                 <label className="text-sm font-medium">Expense Type</label>
                 <div
                     onClick={() => setDropdownOpen((prev) => !prev)}
-                    className="w-full mt-1 p-2 border rounded-lg flex justify-between items-center cursor-pointer bg-white"
+                    className="w-1/2 mt-1 p-2 border border-gray-300 rounded-lg flex justify-between items-center cursor-pointer bg-white"
                 >
                     <span>
                         {selectedExpenseType?.category || "Select Expense Type"}
@@ -86,7 +86,7 @@ const AddExpenseForm = ({ onAddExpense }) => {
                 </div>
 
                 {dropdownOpen && (
-                    <ul className="absolute w-full bg-white border rounded-lg mt-1 shadow-lg max-h-60 overflow-auto z-50">
+                    <ul className="absolute w-1/2 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg max-h-60 overflow-auto z-50">
                         {expenseType.length === 0 && (
                             <li className="p-2 text-gray-400">No Data Found</li>
                         )}

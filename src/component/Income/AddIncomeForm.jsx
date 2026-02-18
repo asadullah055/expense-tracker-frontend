@@ -85,7 +85,7 @@ const AddIncomeForm = ({ onAddIncome }) => {
 
                 <div
                     onClick={() => setDropdownOpen(prev => !prev)}
-                    className="w-full mt-1 p-2 border rounded-lg flex justify-between items-center cursor-pointer bg-white"
+                    className="w-1/2 mt-1 p-2 border border-gray-300 rounded-lg flex justify-between items-center cursor-pointer bg-white"
                 >
                     <span>
                         {selectedIncomeType?.category || "Select Income Type"}
@@ -97,7 +97,7 @@ const AddIncomeForm = ({ onAddIncome }) => {
                 </div>
 
                 {dropdownOpen && (
-                    <ul className="absolute w-full bg-white border rounded-lg mt-1 shadow-lg max-h-60 overflow-auto z-50">
+                    <ul className="absolute w-1/2 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg max-h-60 overflow-auto z-50">
 
                         {incomeType.length === 0 && (
                             <li className="p-2 text-gray-400">No Data Found</li>

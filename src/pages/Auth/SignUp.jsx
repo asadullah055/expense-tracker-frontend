@@ -101,7 +101,7 @@ const SignUp = () => {
                         {error && <p className="text-red-500 text-xs pb-2.5">{error}</p>}
                         <button
                             type="submit"
-                            className="btn-primary disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="btn-primary cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
                             disabled={isLoading}
                         >
                             {isLoading ? "Creating account..." : "Sign Up"}

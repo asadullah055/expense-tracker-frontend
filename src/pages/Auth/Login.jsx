@@ -71,7 +71,7 @@ const Login = () => {
                             type="password"
                         />
                         {error && <p className="text-red-500 text-xs pb-2.5">{error}</p>}
-                        <button type="submit" className="btn-primary disabled:opacity-70 disabled:cursor-not-allowed" disabled={isLoading}>
+                        <button type="submit" className="btn-primary cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed" disabled={isLoading}>
                             {isLoading ? "Logging in..." : "Log In"}
                         </button>
                         <p className="text-[13px] text-slate-800 mt-3 ">

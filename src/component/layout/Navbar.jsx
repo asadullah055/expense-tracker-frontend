@@ -154,7 +154,7 @@ const Navbar = ({ activeMenu }) => {
                     <div className="relative">
                         <button
                             onClick={() => setOpenWorkspace(!openWorkspace)}
-                            className="flex items-center justify-between gap-2 border border-gray-300 px-3 py-2 rounded-lg min-w-60 hover:bg-gray-50 transition"
+                            className="flex items-center justify-between gap-2 border border-gray-300 px-3 py-2 rounded-lg min-w-60 hover:bg-gray-50 transition cursor-pointer"
                         >
                             <span className="text-sm font-medium">
                                 {currentWorkspace?.name || currentWorkspace?.companyName || "Loading..."}
@@ -171,7 +171,7 @@ const Navbar = ({ activeMenu }) => {
                                             setCurrentWorkspace(ws);
                                             setOpenWorkspace(false);
                                         }}
-                                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm"
+                                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-sm cursor-pointer"
                                     >
                                         {ws.name || ws.companyName}
                                     </button>
@@ -184,7 +184,7 @@ const Navbar = ({ activeMenu }) => {
                                         setOpenAddCompanyModal(true);
                                         setOpenWorkspace(false);
                                     }}
-                                    className="w-full text-left px-3 py-2 text-sm text-purple-600 hover:bg-purple-50 rounded-lg"
+                                    className="w-full text-left px-3 py-2 text-sm text-purple-600 hover:bg-purple-50 rounded-lg cursor-pointer"
                                 >
                                     + Add Company
                                 </button>
