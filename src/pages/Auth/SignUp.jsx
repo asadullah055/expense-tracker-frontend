@@ -14,6 +14,7 @@ const SignUp = () => {
     const [profilePic, setProfilePic] = useState(null);
     const [fullName, setFullName] = useState("");
     const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const { updateUser } = useContext(UserContext);
     const navigate = useNavigate();
 
@@ -36,6 +37,7 @@ const SignUp = () => {
         //signup API Call
 
         try {
+            setIsLoading(true);
 
             //upload profile picture if selected
             if (profilePic) {
@@ -56,6 +58,8 @@ const SignUp = () => {
             } else {
                 setError("Something went wrong. Please try again later.");
             }
+        } finally {
+            setIsLoading(false);
         }
     }
     return (
@@ -95,8 +99,12 @@ const SignUp = () => {
                         </div>
 
                         {error && <p className="text-red-500 text-xs pb-2.5">{error}</p>}
-                        <button type="submit" className="btn-primary">
-                            Log In
+                        <button
+                            type="submit"
+                            className="btn-primary disabled:opacity-70 disabled:cursor-not-allowed"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "Creating account..." : "Sign Up"}
                         </button>
                         <p className="text-[13px] text-slate-800 mt-3 ">
                             Already have an account?{" "}
