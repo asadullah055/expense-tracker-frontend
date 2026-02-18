@@ -1,4 +1,4 @@
-export const BASE_URL = "http://localhost:8000";
+export const BASE_URL = "https://expense-tracker-server-pi-tan.vercel.app";
 // utils/apiPaths.js
 
 export const API_PATHS = {
@@ -29,6 +29,7 @@ export const API_PATHS = {
   EXPENSECATEGORY:{
     ADD_EXPENSE_CATEGORY :"/api/v1/expensecategory/add",
     GET_ALL_EXPENSE_CATEGORY: "/api/v1/expensecategory/get",
+    GET_ALL_EXPENSE_CATEGORY_TYPE: "/api/v1/expensecategory/get",
   },
   INCOMECATEGORY:{
     ADD_EXPENSE_CATEGORY :"/api/v1/incomecategory/add",

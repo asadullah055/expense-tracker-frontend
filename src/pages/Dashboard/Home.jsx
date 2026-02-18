@@ -10,6 +10,7 @@ import Last30DaysExpenses from "../../component/Dashboard/Last30DaysExpenses";
 import RecentIncomeWithChart from "../../component/Dashboard/RecentIncomeWithChart";
 import RecentTransactions from "../../component/Dashboard/RecentTransactions";
 import DashboardLayout from "../../component/layout/DashboardLayout";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { API_PATHS } from "../../utils/apiPaths";
 import axiosInstance from "../../utils/axiosInstance";
@@ -18,14 +19,28 @@ import RecentIncome from './../../component/Dashboard/RecentIncome';
 
 const Home = () => {
     useUserAuth()
+    const { currentWorkspace } = useWorkspace();
 
     const navigation = useNavigate();
     const [dashboardData, setDashboardData] = useState(null)
     const [loading, setLoading] = useState(false);
+
     const fetchDashboardData = async () => {
+        const workspaceId =
+            currentWorkspace?._id ||
+            currentWorkspace?.id ||
+            currentWorkspace?.companyId;
+
+        if (!workspaceId) {
+            setDashboardData(null);
+            return;
+        }
+
         setLoading(true);
         try {
-            const response = await axiosInstance.get(`${API_PATHS.DASHBOARD.GET_DATA}`)
+            const response = await axiosInstance.get(API_PATHS.DASHBOARD.GET_DATA, {
+                params: { workspaceId },
+            })
             if (response.data) {
                 setDashboardData(response.data);
             }
@@ -37,7 +52,7 @@ const Home = () => {
     }
     useEffect(() => {
         fetchDashboardData();
-    }, [])
+    }, [currentWorkspace])
 
     return (
         <DashboardLayout activeMenu="Dashboard">

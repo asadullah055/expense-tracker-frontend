@@ -10,6 +10,20 @@ const SideMenu = ({ activeMenu }) => {
 
     const navigate = useNavigate();
     const displayName = currentWorkspace?.name || currentWorkspace?.companyName || user?.fullName || "";
+    const isPersonalWorkspace =
+        !currentWorkspace ||
+        currentWorkspace?.type === "personal" ||
+        currentWorkspace?._id === user?._id;
+    const workspaceImageUrl = isPersonalWorkspace
+        ? user?.profileImageUrl
+        : currentWorkspace?.profileImageUrl ||
+        currentWorkspace?.companyImageUrl ||
+        currentWorkspace?.logoUrl ||
+        currentWorkspace?.imageUrl ||
+        "";
+    const profileImageSrc = workspaceImageUrl
+        ? `${workspaceImageUrl}${workspaceImageUrl.includes("?") ? "&" : "?"}v=${encodeURIComponent(currentWorkspace?.updatedAt || currentWorkspace?._id || user?.updatedAt || user?._id || "1")}`
+        : "";
 
     const handleClick = (route) => {
         if (route === "logout") {
@@ -28,9 +42,9 @@ const SideMenu = ({ activeMenu }) => {
         <div className='w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 p-5 sticky top-[61px] z-20'>
             <div className="flex flex-col items-center justify-center gap-3 mt-3 mb-7">
                 {
-                    user?.profileImageUrl ? (
+                    profileImageSrc ? (
                         <img
-                            src={user?.profileImageUrl || ""}
+                            src={profileImageSrc}
                             alt="Profile"
                             className="w-20 h-20 rounded-full bg-slate-400"
                         />

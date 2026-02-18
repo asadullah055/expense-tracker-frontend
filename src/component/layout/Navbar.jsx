@@ -35,7 +35,7 @@ const Navbar = ({ activeMenu }) => {
     };
 
     // ================= FETCH ALL WORKSPACES =================
-    const fetchAllWorkspaces = async () => {
+    const fetchAllWorkspaces = async (preferredWorkspaceId = null) => {
         try {
             setLoading(true);
 
@@ -61,6 +61,9 @@ const Navbar = ({ activeMenu }) => {
             setWorkspaces(finalWorkspaces);
 
             if (finalWorkspaces.length > 0) {
+                const preferredWorkspace = preferredWorkspaceId
+                    ? finalWorkspaces.find((ws) => getWorkspaceId(ws) === preferredWorkspaceId)
+                    : null;
                 const currentWorkspaceId = getWorkspaceId(currentWorkspace);
                 const matchedById = currentWorkspaceId
                     ? finalWorkspaces.find((ws) => getWorkspaceId(ws) === currentWorkspaceId)
@@ -73,7 +76,7 @@ const Navbar = ({ activeMenu }) => {
                             ws.type === currentWorkspace?.type
                     )
                     : null;
-                const matchedWorkspace = matchedById || matchedByName;
+                const matchedWorkspace = preferredWorkspace || matchedById || matchedByName;
 
                 if (matchedWorkspace) {
                     if (!isSameWorkspace(matchedWorkspace, currentWorkspace)) {
@@ -99,16 +102,21 @@ const Navbar = ({ activeMenu }) => {
         }
 
         try {
-            await axiosInstance.post(API_PATHS.COMPANY.ADD_COMPANY, {
+            const addCompanyRes = await axiosInstance.post(API_PATHS.COMPANY.ADD_COMPANY, {
                 companyName,
             });
+            const createdCompany =
+                addCompanyRes?.data?.company ||
+                addCompanyRes?.data?.data ||
+                addCompanyRes?.data;
+            const newCompanyId = getWorkspaceId(createdCompany);
 
             toast.success("Company added");
 
             setCompanyName("");
             setOpenAddCompanyModal(false);
 
-            fetchAllWorkspaces(); // Refresh list
+            await fetchAllWorkspaces(newCompanyId); // Refresh list + focus new company
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to add company");
         }

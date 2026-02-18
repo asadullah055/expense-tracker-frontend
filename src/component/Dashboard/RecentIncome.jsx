@@ -3,6 +3,7 @@ import { LuArrowRight } from "react-icons/lu";
 import TransactionCard from "../Cards/TransactionCard";
 
 const RecentIncome = ({ transactions, onSeeMore }) => {
+
     return (
         <div className="card">
             <div className="flex items-center justify-between ">
@@ -16,7 +17,7 @@ const RecentIncome = ({ transactions, onSeeMore }) => {
                 {transactions?.slice(0, 5)?.map((item) => (
                     <TransactionCard
                         key={item._id}
-                        title={item.source}
+                        title={item.category}
                         icon={item.icon}
                         date={moment(item.date).format("Do MMM YYYY")}
                         amount={item.amount}

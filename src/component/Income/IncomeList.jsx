@@ -3,6 +3,7 @@ import { LuDownload } from 'react-icons/lu';
 import TransactionCard from './../Cards/TransactionCard';
 
 const IncomeList = ({ transactions, onDelete, onDownload }) => {
+  
     return (
         <div className="card">
             <div className="flex items-center justify-between">
@@ -15,7 +16,7 @@ const IncomeList = ({ transactions, onDelete, onDownload }) => {
                 {transactions?.map((income) => (
                     <TransactionCard
                         key={income._id}
-                        title={income.source}
+                        title={income.category}
                         icon={income.icon}
                         date={moment(income.date).format("Do MMM YYYY")}
                         amount={income.amount}

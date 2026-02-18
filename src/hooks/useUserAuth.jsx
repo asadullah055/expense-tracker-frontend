@@ -5,10 +5,15 @@ import { API_PATHS } from "../utils/apiPaths";
 import axiosInstance from './../utils/axiosInstance';
 
 export const useUserAuth = () => {
-    const { user, updateUser, clearUser } = useContext(UserContext);
+    const { updateUser, clearUser } = useContext(UserContext);
     const navigate = useNavigate();
     useEffect(() => {
-        if (user) return
+        const accessToken = localStorage.getItem("token");
+        if (!accessToken) {
+            clearUser();
+            navigate("/login");
+            return;
+        }
         let isMounted = true;
 
         const fetchUerInfo = async () => {

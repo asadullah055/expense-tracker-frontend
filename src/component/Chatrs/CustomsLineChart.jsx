@@ -1,7 +1,6 @@
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 const CustomsLineChart = ({ data }) => {
-
     const CustomsTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
             return (<div className="bg-white shadow-md rounded-lg p-2 border border-gray-300">

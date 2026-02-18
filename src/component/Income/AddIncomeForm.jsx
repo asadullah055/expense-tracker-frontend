@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { HiChevronDown } from "react-icons/hi";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import { API_PATHS } from "../../utils/apiPaths";
 import axiosInstance from "../../utils/axiosInstance";
 import Inputs from "../Inputes/Inputs";
 
 const AddIncomeForm = ({ onAddIncome }) => {
+    const { currentWorkspace } = useWorkspace();
 
     const [loading, setLoading] = useState(false)
     const [incomeType, setIncomeType] = useState([])
@@ -28,6 +30,8 @@ const AddIncomeForm = ({ onAddIncome }) => {
             [key]: value
         }))
     }
+    const workspaceTypeLabel =
+        currentWorkspace?.type === "personal" ? "Personal" : "Company";
 
     // Fetch Income Type
     const fetchIncomeType = async () => {
@@ -36,15 +40,18 @@ const AddIncomeForm = ({ onAddIncome }) => {
         setLoading(true);
         try {
             const response = await axiosInstance.get(
-                `${API_PATHS.INCOMECATEGORY.GET_ALL_INCOME_CATEGORY_TYPE}/Personal`
+                `${API_PATHS.INCOMECATEGORY.GET_ALL_INCOME_CATEGORY_TYPE}/${workspaceTypeLabel}`
             );
 
             if (response.data) {
                 setIncomeType(response.data);
+                setSelectedIncomeType(null);
+                setIncome((prev) => ({ ...prev, incomeTypeId: "" }));
             }
 
         } catch (error) {
             console.log("Something went wrong", error)
+            setIncomeType([]);
         } finally {
             setLoading(false);
         }
@@ -67,7 +74,7 @@ const AddIncomeForm = ({ onAddIncome }) => {
 
     useEffect(() => {
         fetchIncomeType();
-    }, [])
+    }, [workspaceTypeLabel])
 
     return (
         <div>

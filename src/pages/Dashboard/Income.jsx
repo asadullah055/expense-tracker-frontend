@@ -22,12 +22,23 @@ const Income = () => {
         data: null,
     });
     // Get All Income Details
-
     const fetchIncomeDetails = async () => {
+        const workspaceId =
+            currentWorkspace?._id ||
+            currentWorkspace?.id ||
+            currentWorkspace?.companyId;
+
+        if (!workspaceId) {
+            setIncomeData([]);
+            return;
+        }
+
         if (loading) return;
         setLoading(true);
         try {
-            const response = await axiosInstance.get(API_PATHS.INCOME.GET_ALL_INCOME);
+            const response = await axiosInstance.get(API_PATHS.INCOME.GET_ALL_INCOME, {
+                params: { workspaceId },
+            });
             if (response.data) {
                 setIncomeData(response.data);
             }
@@ -93,9 +104,20 @@ const Income = () => {
 
     // handle download income details
     const handleDownloadIncomeDetails = async () => {
+        const workspaceId =
+            currentWorkspace?._id ||
+            currentWorkspace?.id ||
+            currentWorkspace?.companyId;
+
+        if (!workspaceId) {
+            toast.error("Workspace is required");
+            return;
+        }
+
         try {
             const response = await axiosInstance.get(API_PATHS.INCOME.DOWNLOAD_INCOME, {
                 responseType: 'blob',
+                params: { workspaceId },
             });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -113,7 +135,7 @@ const Income = () => {
     useEffect(() => {
         fetchIncomeDetails();
         return () => { }
-    }, [])
+    }, [currentWorkspace])
     return (
         <DashboardLayout activeMenu="Income">
             <div className="my-5 mx-auto ">

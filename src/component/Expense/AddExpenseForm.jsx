@@ -1,53 +1,139 @@
-import { useState } from 'react';
-import EmojiPickerPopup from '../EmojiPickerPopup';
-import Inputs from '../Inputes/Inputs';
+import { useEffect, useRef, useState } from "react";
+import { HiChevronDown } from "react-icons/hi";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { API_PATHS } from "../../utils/apiPaths";
+import axiosInstance from "../../utils/axiosInstance";
+import Inputs from "../Inputes/Inputs";
 
 const AddExpenseForm = ({ onAddExpense }) => {
+    const { currentWorkspace } = useWorkspace();
+
+    const [loading, setLoading] = useState(false);
+    const [expenseType, setExpenseType] = useState([]);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    const dropdownRef = useRef();
+
     const [expense, setExpense] = useState({
-        category: '',
+        expenseTypeId: '',
         amount: '',
         date: '',
-        icon: '',
-    })
+    });
+    const [selectedExpenseType, setSelectedExpenseType] = useState(null);
+
     const handleChange = (key, value) => {
-        setExpense({ ...expense, [key]: value })
-    }
+        setExpense((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
+    };
+
+    const workspaceTypeLabel =
+        currentWorkspace?.type === "personal" ? "Personal" : "Company";
+
+    const fetchExpenseType = async () => {
+        if (loading) return;
+
+        setLoading(true);
+        try {
+            const response = await axiosInstance.get(
+                `${API_PATHS.EXPENSECATEGORY.GET_ALL_EXPENSE_CATEGORY_TYPE}/${workspaceTypeLabel}`
+            );
+            if (response.data) {
+                setExpenseType(response.data);
+                setSelectedExpenseType(null);
+                setExpense((prev) => ({ ...prev, expenseTypeId: "" }));
+            }
+        } catch (error) {
+            console.log("Something went wrong", error);
+            setExpenseType([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
+        fetchExpenseType();
+    }, [workspaceTypeLabel]);
 
     return (
         <div>
+            <div className="mb-4 relative" ref={dropdownRef}>
+                <label className="text-sm font-medium">Expense Type</label>
+                <div
+                    onClick={() => setDropdownOpen((prev) => !prev)}
+                    className="w-full mt-1 p-2 border rounded-lg flex justify-between items-center cursor-pointer bg-white"
+                >
+                    <span>
+                        {selectedExpenseType?.category || "Select Expense Type"}
+                    </span>
+                    <HiChevronDown
+                        className={`transition duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
+                    />
+                </div>
 
-            <EmojiPickerPopup
-                icon={expense.icon}
-                onSelect={(selectedIcon) => handleChange('icon', selectedIcon)}
-            />
-            <Inputs
-                value={expense.category}
-                onChange={(e) => handleChange('category', e.target.value)}
-                label="Expense Category"
-                placeholder="Enter expense category"
-                type="text"
+                {dropdownOpen && (
+                    <ul className="absolute w-full bg-white border rounded-lg mt-1 shadow-lg max-h-60 overflow-auto z-50">
+                        {expenseType.length === 0 && (
+                            <li className="p-2 text-gray-400">No Data Found</li>
+                        )}
 
-            />
+                        {expenseType.map((type) => (
+                            <li
+                                key={type._id}
+                                onClick={() => {
+                                    setSelectedExpenseType(type);
+                                    setExpense((prev) => ({
+                                        ...prev,
+                                        expenseTypeId: type._id || "",
+                                    }));
+                                    setDropdownOpen(false);
+                                }}
+                                className="p-2 hover:bg-gray-100 cursor-pointer transition"
+                            >
+                                {type.category}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
             <Inputs
                 value={expense.amount}
-                onChange={(e) => handleChange('amount', e.target.value)}
+                onChange={(e) => handleChange("amount", e.target.value)}
                 label="Amount"
                 placeholder="Enter amount"
                 type="number"
             />
             <Inputs
                 value={expense.date}
-                onChange={(e) => handleChange('date', e.target.value)}
+                onChange={(e) => handleChange("date", e.target.value)}
                 label="Date"
                 placeholder=""
                 type="date"
             />
+
             <div className="flex justify-end mt-6">
                 <button
-                    type='button'
-                    className='add-btn add-btn-fill'
+                    type="button"
+                    className="add-btn add-btn-fill"
                     onClick={() => onAddExpense(expense)}
-                >Add Expense</button>
+                >
+                    Add Expense
+                </button>
             </div>
         </div>
     );

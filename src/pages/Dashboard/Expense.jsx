@@ -6,12 +6,14 @@ import ExpenseList from "../../component/Expense/ExpenseList";
 import ExpenseOverview from "../../component/Expense/ExpenseOverview";
 import DashboardLayout from "../../component/layout/DashboardLayout";
 import Modal from "../../component/Modal";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import { useUserAuth } from "../../hooks/useUserAuth";
 import { API_PATHS } from "../../utils/apiPaths";
 import axiosInstance from "../../utils/axiosInstance";
 
 const Expense = () => {
     useUserAuth()
+    const { currentWorkspace } = useWorkspace();
     const [openAddExpenseModal, setOpenAddExpenseModal] = useState(false);
     const [expenseData, setExpenseData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -22,10 +24,20 @@ const Expense = () => {
     // Get All Expense Details
 
     const fetchExpenseDetails = async () => {
+        const workspaceId =
+            currentWorkspace?._id ||
+            currentWorkspace?.id ||
+            currentWorkspace?.companyId;
+        if (!workspaceId) {
+            setExpenseData([]);
+            return;
+        }
         if (loading) return;
         setLoading(true);
         try {
-            const response = await axiosInstance.get(API_PATHS.EXPENSE.GET_ALL_EXPENSE);
+            const response = await axiosInstance.get(API_PATHS.EXPENSE.GET_ALL_EXPENSE, {
+                params: { workspaceId },
+            });
             if (response.data) {
                 setExpenseData(response.data);
             }
@@ -38,9 +50,17 @@ const Expense = () => {
     // Handle Add Expense
 
     const handleAddExpense = async (expense) => {
-        const { category, amount, date, icon } = expense;
-        if (!category.trim()) {
+        const workspaceId =
+            currentWorkspace?._id ||
+            currentWorkspace?.id ||
+            currentWorkspace?.companyId;
+        const { expenseTypeId, amount, date } = expense;
+        if (!expenseTypeId?.trim()) {
             toast.error("Category is required");
+            return;
+        }
+        if (!workspaceId) {
+            toast.error("Workspace is required");
             return;
         }
         if (!amount || isNaN(amount) || Number(amount) <= 0) {
@@ -54,10 +74,10 @@ const Expense = () => {
         try {
 
             await axiosInstance.post(API_PATHS.EXPENSE.ADD_EXPENSE, {
-                category,
+                expenseTypeId,
                 amount,
                 date,
-                icon,
+                workspaceId,
             });
             setOpenAddExpenseModal(false);
             toast.success("Expense added successfully");
@@ -81,9 +101,20 @@ const Expense = () => {
     };
     // handle download expense details
     const handleDownloadExpenseDetails = async () => {
+        const workspaceId =
+            currentWorkspace?._id ||
+            currentWorkspace?.id ||
+            currentWorkspace?.companyId;
+
+        if (!workspaceId) {
+            toast.error("Workspace is required");
+            return;
+        }
+
         try {
             const response = await axiosInstance.get(API_PATHS.EXPENSE.DOWNLOAD_EXPENSE, {
                 responseType: 'blob',
+                params: { workspaceId },
             });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -101,7 +132,7 @@ const Expense = () => {
     useEffect(() => {
         fetchExpenseDetails();
         return () => { }
-    }, [])
+    }, [currentWorkspace])
 
     return (
         <DashboardLayout activeMenu="Expense">
