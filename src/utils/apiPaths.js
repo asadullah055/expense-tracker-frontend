@@ -1,4 +1,5 @@
 export const BASE_URL = "https://expense-tracker-server-pi-tan.vercel.app";
+// export const BASE_URL = "http://localhost:8000";
 // utils/apiPaths.js
 
 export const API_PATHS = {
@@ -39,5 +40,10 @@ export const API_PATHS = {
   COMPANY:{
     ADD_COMPANY :"/api/v1/company/add",
     GET_ALL_COMPANY: "/api/v1/company/get",
+  },
+  TELEGRAM: {
+    INIT_LINK: "/api/v1/telegram/link/init",
+    LINK_STATUS: "/api/v1/telegram/link/status",
+    UNLINK: "/api/v1/telegram/unlink",
   }
 };
