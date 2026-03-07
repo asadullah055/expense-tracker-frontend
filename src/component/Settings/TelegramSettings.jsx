@@ -28,7 +28,7 @@ const TelegramSettings = ({
           onClick={onRefreshStatus}
           disabled={loading}
         >
-          <LuRefreshCw className="text-lg" />
+          <LuRefreshCw className={`text-lg ${loading ? "animate-spin" : ""}`} />
           Refresh Status
         </button>
       </div>
